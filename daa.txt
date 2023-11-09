@@ -1,0 +1,325 @@
+package daa_practicals;
+
+public class Fibonacci {
+
+	//recursive code for fibonnaci 
+	static int fib_rec(int n)
+	{
+		//if n is 1 then return 0 and n is 2 then return 1
+		if(n==1)
+			return 0;
+		else if(n==2)
+			return 1;
+		
+		//else return fib(n-1) + fib(n-2)
+		return fib_rec(n-1) + fib_rec(n-2);
+	}
+	
+	//non-recursive code for fibonacci
+	static int fib(int n) {
+		//initial coditions
+		if(n==1) 
+			return 0;
+		else if (n==2) 
+			return 1;
+		
+		//else
+		int f1, f2, f3=0;
+		f1=0; f2=1;
+		for(int i=3; i<=n; i++) {
+			f3 = f1+f2;
+			f1 = f2;
+			f2 = f3;
+		}
+		return f3;
+	}
+	
+	public static void main(String[] args) {
+		
+		for(int i=1; i<=10; i++) {
+			System.out.print(fib(i)+ " ");
+		}
+		System.out.println();
+		
+		for(int i=1; i<=10; i++) {
+			System.out.print(fib_rec(i) + " ");
+		}
+
+	}
+
+}
+
+//DAA Practical 4: Fractional Knapsack Problem
+package daa_practicals;
+import java.util.*;
+
+class item{
+	float wt;
+	float profit;
+	
+	//constructor
+	public item(int p, int w) {
+		this.wt = w;
+		this.profit = p;
+	}
+}
+
+public class FracktionalKnapsack {
+
+	static void fracKnapsack(item[] items, float bagsize) {
+		float maxprofit=0;
+		Arrays.sort(items, new MyComparator1());
+		
+		for(int i=0; i<items.length; i++) {
+			
+			if(bagsize >= items[i].wt) 
+			{
+				maxprofit = maxprofit + items[i].profit;
+				bagsize = bagsize-items[i].wt;
+			}
+			else
+			{
+				float x = (items[i].profit/items[i].wt)* bagsize;
+				maxprofit = maxprofit+x;
+				bagsize=0;
+				break;
+			}
+		}
+		System.out.println(maxprofit);
+	}
+	
+	public static void main(String[] args) {
+		item[] arr = {new item(60,10), new item(100,20), new item(120,30)};
+		
+		int bagsize = 50;
+		
+		System.out.print("MaxProfit is: ");
+		fracKnapsack(arr, bagsize);
+	}
+
+}
+
+//comparator class
+class MyComparator1 implements Comparator<item> {
+	public int compare(item x, item y) {
+		float a = (x.profit/x.wt);
+		float b = (y.profit/y.wt);
+		
+		if(a>b)
+			return -1;
+		else
+			return 1;
+	}
+}
+
+//DAA Practical 2: Huffman Encoding
+package daa_practicals;
+
+//importing packages
+import java.util.PriorityQueue;
+import java.util.Comparator;
+
+public class HuffmanEncoding {
+	
+	public static void printCode(HuffmanNode root, String s)
+	{
+		if(root.left == null && root.right == null && Character.isLetter(root.c))
+		{
+			System.out.println(root.c + ":" + s);
+			return;
+		}
+		printCode(root.left, s + "0");
+		printCode(root.right, s + "1");
+	}
+	
+	//main method
+	public static void main(String[] args) 
+	{
+		int n=6;
+		char[] charArray = {'a', 'b', 'c', 'd', 'e', 'f'};
+		int[] charfreq = {5, 9, 12, 13, 16, 45};
+		
+		PriorityQueue<HuffmanNode> q = new PriorityQueue<HuffmanNode>(n, new MyComparator());
+		
+		for(int i=0; i<n; i++) {
+			//creating object
+			HuffmanNode hn = new HuffmanNode();
+			
+			hn.c = charArray[i];
+			hn.data = charfreq[i];
+			hn.left = null;
+			hn.right = null;
+			q.add(hn);
+		}
+		
+		HuffmanNode root = null;
+		
+		while(q.size()>1) {
+			HuffmanNode x = q.peek();
+			q.poll();
+			HuffmanNode y = q.peek();
+			q.poll();
+			HuffmanNode f = new HuffmanNode();
+			f.data = x.data + y.data;
+			f.c = '-';
+			f.left = x;
+			f.right = y;
+			root = f;
+			q.add(f);
+		}
+		
+		printCode(root,"");
+	}
+}
+
+//HuffmanNode class
+class HuffmanNode{
+	int data;
+	char c;
+	HuffmanNode left;
+	HuffmanNode right;
+}
+	
+//Comparator: comparing the node x and y of Huffman tree
+class MyComparator implements Comparator<HuffmanNode> {
+	public int compare(HuffmanNode x, HuffmanNode y)
+	{
+		return x.data - y.data;
+	}
+}
+
+
+//DAA Practical 4: N-Queen using Backtracking
+package daa_practicals;
+
+public class NQueen {
+	
+	final int N = 4;
+	
+	//for print the solution
+	void printSolution(int board[][]) {
+		for(int i=0; i<N; i++) {
+			for(int j=0; j<N; j++) {
+				System.out.print(" " + board[i][j]+ " ");
+			}
+			System.out.println();
+		}
+	}
+	
+	//important function for check the location is safe or not
+	boolean isSafe(int board[][], int row, int col) {
+		int i,j;
+		for(i=0; i<col; i++) {
+			if(board[row][i] == 1)
+				return false;
+		}
+		
+		for(i=row, j=col; i>=0 && j>=0; i--, j--) {
+			if(board[i][j] == 1)
+				return false;
+		}
+		
+		for(i=row, j=col; j>=0 && i<N; i++, j--) {
+			if(board[i][j] == 1)
+				return false;
+		}
+		return true;
+	}
+	
+	
+	boolean solveNQUtil(int board[][], int col) {
+		if(col >= N) {
+			return true;
+		}
+		
+		for(int i=0; i<N; i++) {
+			if(isSafe(board, i, col)) {
+				board[i][col] = 1;
+				
+				if(solveNQUtil(board, col+1) == true)
+					return true;
+				
+				board[i][col] = 0;
+			}
+		}
+		return false;
+	}
+	
+	
+	//Initialize the board and check solution exist or not
+	void solveNQ() {
+		//creating array 4*4
+		int board[][] = {{0,0,0,0},
+						{0,0,0,0},
+						{0,0,0,0},
+						{0,0,0,0} };
+		
+		if(solveNQUtil(board,0) == false) {
+			System.out.println("Solution does not exist");
+		}
+		else {
+			printSolution(board);
+		}
+		
+	}
+	
+	//main method calling the solveNQ
+	public static void main(String[] args) {
+		NQueen nq = new NQueen();
+		
+		nq.solveNQ();
+
+	}
+
+}
+
+//DAA Practical 3: 0/1 Knapsack Problem using Dynamic programming
+package daa_practicals;
+
+import java.util.*;
+
+public class ZeroOneKnapsack {
+
+	//calculating maximum
+	static int max(int a, int b)
+	{
+		if(a>b) return a;
+		return b;
+	}
+	
+	static int zerooneKnapsack(int wt[], int prof[], int bagsize, int n) 
+	{
+		int [][] dp = new int[n+1][bagsize+1];
+		
+		//for items
+		for(int i=0; i<=n; i++) {
+			//bagsize
+			for(int j=0; j<=bagsize; j++) {
+				
+				if(i==0 || j==0) {
+					dp[i][j]=0;
+				}
+				else if(wt[i-1]<=j) {
+					dp[i][j] = max(dp[i-1][j-wt[i-1]] + prof[i-1], dp[i-1][j]);
+				}
+				else {
+					dp[i][j] = dp[i-1][j];
+				}
+				
+			}
+		}
+		return dp[n][bagsize];
+	}
+	
+	
+	public static void main(String[] args) {
+		//values
+		int prof[] = {60,100,120};
+		int wt[] = {10,20,30};
+		int bag=40;
+		
+		System.out.println("Max Profit: "+zerooneKnapsack(wt, prof, bag, 3));
+
+	}
+
+}
